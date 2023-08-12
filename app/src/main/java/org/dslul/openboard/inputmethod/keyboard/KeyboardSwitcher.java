@@ -276,6 +276,14 @@ public final class KeyboardSwitcher implements KeyboardState.SwitchActions {
         setKeyboard(KeyboardId.ELEMENT_SYMBOLS, KeyboardSwitchState.OTHER);
     }
 
+    @Override
+    public void setNumpadKeyboard() {
+        if (DEBUG_ACTION) {
+            Log.d(TAG, "setNumpadKeyboard");
+        }
+        setKeyboard(KeyboardId.ELEMENT_PHONE, KeyboardSwitchState.OTHER);
+    }
+
     // Implements {@link KeyboardState.SwitchActions}.
     @Override
     public void setSymbolsShiftedKeyboard() {
@@ -348,6 +356,7 @@ public final class KeyboardSwitcher implements KeyboardState.SwitchActions {
         HIDDEN(-1),
         SYMBOLS_SHIFTED(KeyboardId.ELEMENT_SYMBOLS_SHIFTED),
         EMOJI(KeyboardId.ELEMENT_EMOJI_RECENTS),
+        PHONE(KeyboardId.ELEMENT_PHONE),
         CLIPBOARD(KeyboardId.ELEMENT_CLIPBOARD),
         OTHER(-1);
 
@@ -371,6 +380,8 @@ public final class KeyboardSwitcher implements KeyboardState.SwitchActions {
             return KeyboardSwitchState.CLIPBOARD;
         } else if (isShowingKeyboardId(KeyboardId.ELEMENT_SYMBOLS_SHIFTED)) {
             return KeyboardSwitchState.SYMBOLS_SHIFTED;
+        } else if (isShowingKeyboardId(KeyboardId.ELEMENT_PHONE)) {
+            return KeyboardSwitchState.PHONE;
         }
         return KeyboardSwitchState.OTHER;
     }
@@ -386,6 +397,8 @@ public final class KeyboardSwitcher implements KeyboardState.SwitchActions {
             mLatinIME.startShowingInputView(true);
             if (toggleState == KeyboardSwitchState.EMOJI) {
                 setEmojiKeyboard();
+            } else if (toggleState == KeyboardSwitchState.PHONE) {
+                setNumpadKeyboard();
             } else if (toggleState == KeyboardSwitchState.CLIPBOARD) {
                 setClipboardKeyboard();
             } else {

@@ -57,7 +57,8 @@ public final class KeyboardCodesSet {
         "key_alpha_from_clipboard",
         "key_start_onehanded",
         "key_stop_onehanded",
-        "key_switch_onehanded"
+        "key_switch_onehanded",
+        "key_numpad"
     };
 
     private static final int[] DEFAULT = {
@@ -82,7 +83,8 @@ public final class KeyboardCodesSet {
         Constants.CODE_ALPHA_FROM_CLIPBOARD,
         Constants.CODE_START_ONE_HANDED_MODE,
         Constants.CODE_STOP_ONE_HANDED_MODE,
-        Constants.CODE_SWITCH_ONE_HANDED_MODE
+        Constants.CODE_SWITCH_ONE_HANDED_MODE,
+        Constants.CODE_NUMPAD,
     };
 
     static {

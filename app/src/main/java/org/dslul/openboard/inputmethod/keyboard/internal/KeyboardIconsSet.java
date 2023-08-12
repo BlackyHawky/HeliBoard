@@ -65,7 +65,7 @@ public final class KeyboardIconsSet {
     public static final String NAME_START_ONEHANDED_KEY = "start_onehanded_mode_key";
     public static final String NAME_STOP_ONEHANDED_KEY = "stop_onehanded_mode_key";
     public static final String NAME_SWITCH_ONEHANDED_KEY = "switch_onehanded_key";
-
+    public static final String NAME_NUMPAD_KEY = "numpad_key";
     private static final SparseIntArray ATTR_ID_TO_ICON_ID = new SparseIntArray();
 
     // Icon name to icon id map.
@@ -101,6 +101,7 @@ public final class KeyboardIconsSet {
         NAME_START_ONEHANDED_KEY,         R.styleable.Keyboard_iconStartOneHandedMode,
         NAME_STOP_ONEHANDED_KEY,          R.styleable.Keyboard_iconStopOneHandedMode,
         NAME_SWITCH_ONEHANDED_KEY,        R.styleable.Keyboard_iconSwitchOneHandedMode,
+        NAME_NUMPAD_KEY,                  R.styleable.Keyboard_iconNumpadKey,
     };
 
     private static int NUM_ICONS = NAMES_AND_ATTR_IDS.length / 2;

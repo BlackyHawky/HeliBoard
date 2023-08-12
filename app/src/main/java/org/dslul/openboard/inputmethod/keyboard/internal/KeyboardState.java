@@ -16,6 +16,8 @@
 
 package org.dslul.openboard.inputmethod.keyboard.internal;
 
+import static org.dslul.openboard.inputmethod.keyboard.KeyboardId.MODE_PHONE;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -51,6 +53,7 @@ public final class KeyboardState {
         void setAlphabetShiftLockedKeyboard();
         void setAlphabetShiftLockShiftedKeyboard();
         void setEmojiKeyboard();
+        void setNumpadKeyboard();
         void setClipboardKeyboard();
         void setSymbolsKeyboard();
         void setSymbolsShiftedKeyboard();
@@ -334,6 +337,17 @@ public final class KeyboardState {
         // Reset alphabet shift state.
         mAlphabetShiftState.setShiftLocked(false);
         mSwitchState = SWITCH_STATE_SYMBOL_BEGIN;
+    }
+
+    private void setNumpadKeyboard() {
+        if (DEBUG_INTERNAL_ACTION) {
+            Log.d(TAG, "setNumpadKeyboard");
+        }
+        mMode = MODE_PHONE;
+        mIsSymbolShifted = false;
+        mRecapitalizeMode = RecapitalizeStatus.NOT_A_RECAPITALIZE_MODE;
+        mSwitchActions.setNumpadKeyboard();
+        mAlphabetShiftState.setShiftLocked(false);
     }
 
     private void setSymbolsShiftedKeyboard() {
@@ -687,7 +701,7 @@ public final class KeyboardState {
             }
             break;
         case SWITCH_STATE_SYMBOL_BEGIN:
-            if (mMode == MODE_EMOJI || mMode == MODE_CLIPBOARD) {
+            if (mMode == MODE_EMOJI || mMode == MODE_CLIPBOARD || mMode == MODE_PHONE) {
                 // When in the Emoji keyboard or clipboard one, we don't want to switch back to the main layout even
                 // after the user hits an emoji letter followed by an enter or a space.
                 break;
@@ -718,6 +732,8 @@ public final class KeyboardState {
             updateAlphabetShiftState(autoCapsFlags, recapitalizeMode);
         } else if (code == Constants.CODE_EMOJI) {
             setEmojiKeyboard();
+        } else if (code == Constants.CODE_NUMPAD) {
+            setNumpadKeyboard();
         } else if (code == Constants.CODE_ALPHA_FROM_EMOJI) {
             setAlphabetKeyboard(autoCapsFlags, recapitalizeMode);
         } else if (code == Constants.CODE_CLIPBOARD) {

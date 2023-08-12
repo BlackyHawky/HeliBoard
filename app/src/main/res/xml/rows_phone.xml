@@ -27,20 +27,26 @@
         latin:keyboardLayout="@xml/key_styles_number" />
     <Row>
         <Key
+            latin:keySpec="+"
+            latin:backgroundType="functional"
+            latin:keyWidth="15%p" />
+        <Key
             latin:keyStyle="num1KeyStyle" />
         <Key
             latin:keyStyle="num2KeyStyle" />
         <Key
             latin:keyStyle="num3KeyStyle" />
         <Key
-            latin:keySpec="-"
-            latin:moreKeys="+"
-            latin:keyLabelFlags="hasPopupHint"
-            latin:keyStyle="numKeyStyle"
+            latin:keySpec="%"
             latin:backgroundType="functional"
             latin:keyWidth="fillRight" />
     </Row>
+
     <Row>
+        <Key
+            latin:keySpec="-"
+            latin:backgroundType="functional"
+            latin:keyWidth="15%p" />
         <Key
             latin:keyStyle="num4KeyStyle" />
         <Key
@@ -48,12 +54,18 @@
         <Key
             latin:keyStyle="num6KeyStyle" />
         <Key
-            latin:keySpec="."
-            latin:keyStyle="numKeyStyle"
-            latin:backgroundType="functional"
-            latin:keyWidth="fillRight" />
+            latin:keyStyle="numSpaceKeyStyle"
+            latin:keyWidth="fillRight"
+            latin:backgroundType="functional" />
     </Row>
+
     <Row>
+        <Key
+            latin:keySpec="*"
+            latin:keyHintLabel="/"
+            latin:moreKeys="/"
+            latin:backgroundType="functional"
+            latin:keyWidth="15%p" />
         <Key
             latin:keyStyle="num7KeyStyle" />
         <Key
@@ -64,16 +76,30 @@
             latin:keyStyle="deleteKeyStyle"
             latin:keyWidth="fillRight" />
     </Row>
+
     <Row>
         <Key
-            latin:keyStyle="numPhoneToSymbolKeyStyle" />
+            latin:keyStyle="toAlphaKeyStyle"
+            latin:backgroundType="functional"
+            latin:keyWidth="15%p" />
         <!-- U+0030: "0" DIGIT ZERO -->
+        <include
+            latin:keyboardLayout="@xml/key_comma"
+            latin:keyWidth="10%p" />
+        <Key
+            latin:keyStyle="toSymbolKeyStyle"
+            latin:keyWidth="13%p" />
         <Key
             latin:keyStyle="num0KeyStyle"
             latin:keySpec="0 +|0"
             latin:moreKeys="!noPanelAutoMoreKey!,+" />
         <Key
-            latin:keyStyle="numSpaceKeyStyle" />
+            latin:keySpec="="
+            latin:backgroundType="functional"
+            latin:keyWidth="13%p" />
+        <include
+            latin:keyboardLayout="@xml/key_period"
+            latin:keyWidth="10%p" />
         <Key
             latin:keyStyle="enterKeyStyle"
             latin:keyWidth="fillRight" />

@@ -95,6 +95,26 @@
                 latin:backgroundType="functional" />
         </default>
     </switch>
+
+    <!-- numpadKeyStyle -->
+    <switch>
+        <case latin:keyboardTheme="ICS|KLP|LXXLightBorder|LXXDarkBorder|LXXBaseBorder|LXXBase">
+            <key-style
+                latin:styleName="toNumpadStyle"
+                latin:keySpec="!icon/numpad_key|!code/key_numpad"
+                latin:keyActionFlags="noKeyPreview"
+                latin:backgroundType="functional" />
+        </case>
+        <default>
+            <key-style
+                latin:styleName="toNumpadStyle"
+                latin:keySpec="!icon/numpad_key|!code/key_numpad"
+                latin:keyLabelFlags="keepBackgroundAspectRatio"
+                latin:keyActionFlags="noKeyPreview"
+                latin:backgroundType="functional" />
+        </default>
+    </switch>
+
     <include
         latin:keyboardLayout="@xml/key_styles_enter" />
     <!-- TODO: Currently there is no way to specify icon alignment per theme. -->

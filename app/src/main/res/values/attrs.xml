@@ -298,6 +298,7 @@
         <attr name="iconStartOneHandedMode" format="reference" />
         <attr name="iconStopOneHandedMode" format="reference" />
         <attr name="iconSwitchOneHandedMode" format="reference" />
+        <attr name="iconNumpadKey" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="Keyboard_GridRows">
