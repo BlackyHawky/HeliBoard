@@ -31,7 +31,7 @@ object LayoutUtilsCustom {
             Settings.getInstance().loadSettings(context)
         val params = KeyboardParams()
         params.mId = KeyboardLayoutSet.getFakeKeyboardId(KeyboardId.ELEMENT_ALPHABET)
-        params.mPopupKeyTypes.add(POPUP_KEYS_LAYOUT)
+        params.mPopupKeyOrder.add(POPUP_KEYS_LAYOUT)
         addLocaleKeyTextsToParams(context, params, POPUP_KEYS_NORMAL)
         try {
             if (layoutContent.trimStart().startsWith("[") || layoutContent.trimStart().startsWith("//")) {

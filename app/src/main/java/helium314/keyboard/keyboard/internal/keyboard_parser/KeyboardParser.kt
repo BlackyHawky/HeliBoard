@@ -275,16 +275,16 @@ class KeyboardParser(private val params: KeyboardParams, private val context: Co
             baseKeys[0] = numberRowCopy
         } else if (!params.mId.mNumberRowEnabled && params.mId.isAlphabetKeyboard && !hasBuiltInNumbers()) {
             if (baseKeys[0].any { it.popup.main != null || !it.popup.relevant.isNullOrEmpty() } // first row of baseKeys has any layout popup key
-                && params.mPopupKeyLabelSources.let {
+                && params.mPopupKeyHintOrder.let {
                     val layout = it.indexOf(POPUP_KEYS_LAYOUT)
                     val number = it.indexOf(POPUP_KEYS_NUMBER)
                     layout != -1 && layout < number // layout before number label
                 }
             ) {
                 // remove number from labels, to avoid awkward mix of numbers and others caused by layout popup keys
-                params.mPopupKeyLabelSources.remove(POPUP_KEYS_NUMBER)
+                params.mPopupKeyHintOrder.remove(POPUP_KEYS_NUMBER)
             }
-            // add number to the first first row
+            // add number to the first row
             baseKeys.first().forEachIndexed { index, keyData -> keyData.popup.numberLabel = numberRow.getOrNull(index)?.label }
         }
     }
@@ -330,7 +330,7 @@ class KeyboardParser(private val params: KeyboardParams, private val context: Co
     // some layouts have numbers hardcoded in the main layout (pcqwerty as keys, and others as popups)
     private fun hasBuiltInNumbers() = when (params.mId.mSubtype.mainLayoutName) {
         "pcqwerty" -> true
-        "lao", "thai", "korean_sebeolsik_390", "korean_sebeolsik_final" -> Settings.getValues().mPopupKeyTypes.contains(POPUP_KEYS_LAYOUT)
+        "lao", "thai", "korean_sebeolsik_390", "korean_sebeolsik_final" -> Settings.getValues().mPopupKeyOrder.contains(POPUP_KEYS_LAYOUT)
         else -> false
     }
 

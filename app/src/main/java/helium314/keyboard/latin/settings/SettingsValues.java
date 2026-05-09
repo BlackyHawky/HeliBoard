@@ -98,8 +98,8 @@ public class SettingsValues {
     public final float mOneHandedModeScale;
     public final boolean mNarrowKeyGaps;
     public final String mShowMorePopupKeys;
-    public final List<String> mPopupKeyTypes;
-    public final List<String> mPopupKeyLabelSources;
+    public final List<String> mPopupKeyOrder;
+    public final List<String> mPopupKeyHintOrder;
     public final List<Locale> mSecondaryLocales;
     public final boolean mBigramPredictionEnabled;// Use bigrams to predict the next word when there is no input for it yet
     public final boolean mSuggestPunctuation;
@@ -295,8 +295,8 @@ public class SettingsValues {
                 : LocaleKeyboardInfosKt.POPUP_KEYS_NORMAL;
         mColors = KeyboardTheme.getColorsForCurrentTheme(context);
 
-        mPopupKeyTypes = SubtypeUtilsKt.getPopupKeyTypes(selectedSubtype, prefs);
-        mPopupKeyLabelSources = SubtypeUtilsKt.getPopupKeyLabelSources(selectedSubtype, prefs);
+        mPopupKeyOrder = SubtypeUtilsKt.getPopupKeyOrder(selectedSubtype, prefs);
+        mPopupKeyHintOrder = SubtypeUtilsKt.getPopupKeyHintOrder(selectedSubtype, prefs);
         mAddToPersonalDictionary = prefs.getBoolean(Settings.PREF_ADD_TO_PERSONAL_DICTIONARY, Defaults.PREF_ADD_TO_PERSONAL_DICTIONARY);
         mUseContactsDictionary = SettingsValues.readUseContactsEnabled(prefs, context);
         mUseAppsDictionary = prefs.getBoolean(Settings.PREF_USE_APPS, Defaults.PREF_USE_APPS);
