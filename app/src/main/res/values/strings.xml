@@ -942,6 +942,10 @@ New dictionary:
     <string name="search_field_placeholder">Search</string>
     <!-- Button to show later -->
     <string name="ask_later">Ask me later</string>
+    <!-- Switch to toggle suggestions when using the spell checker -->
+    <string name="spell_check_suggestions">Show spellchecker suggestions</string>
+    <!-- Description for toggling suggestions when using the spell checker -->
+    <string name="spell_check_suggestions_summary">Show suggestions when selecting a word with red underline. Requires setting app as default spell checker.</string>
 
 
     <!-- gesture data gathering, new strings for normal use should go above -->
