@@ -2,7 +2,6 @@
 package helium314.keyboard.latin.utils
 
 import android.content.Context
-import android.widget.Toast
 import helium314.keyboard.keyboard.Key
 import helium314.keyboard.keyboard.KeyboardId
 import helium314.keyboard.keyboard.KeyboardLayoutSet
@@ -15,7 +14,6 @@ import helium314.keyboard.latin.common.Constants.Separators
 import helium314.keyboard.latin.common.Constants.Subtype.ExtraValue.KEYBOARD_LAYOUT_SET
 import helium314.keyboard.latin.common.decodeBase36
 import helium314.keyboard.latin.common.encodeBase36
-import helium314.keyboard.latin.define.DebugFlags
 import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.settings.SettingsSubtype.Companion.toSettingsSubtype
@@ -155,10 +153,7 @@ object LayoutUtilsCustom {
     fun removeMissingLayouts(context: Context) {
         val prefs = context.prefs()
         fun remove(type: LayoutType, name: String) {
-            val message = "removing custom layout ${getDisplayName(name)} / $name without file"
-            if (DebugFlags.DEBUG_ENABLED)
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            Log.w(TAG, message)
+            Log.w(TAG, "removing custom layout ${getDisplayName(name)} / $name without file")
             SubtypeSettings.onRenameLayout(type, name, null, context)
         }
         LayoutType.entries.forEach { type ->
