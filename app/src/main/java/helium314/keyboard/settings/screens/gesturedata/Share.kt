@@ -32,6 +32,7 @@ import helium314.keyboard.latin.utils.GestureDataDao
 import helium314.keyboard.latin.utils.getActivity
 import helium314.keyboard.settings.dialogs.ConfirmationDialog
 import helium314.keyboard.settings.filePicker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -53,7 +54,7 @@ fun ShareGestureData(ids: List<Long>) {
     val getDataPicker = getData(ids)
     var exportStarted by remember { mutableStateOf(false) }
     var exportDone by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope { Dispatchers.IO }
     LaunchedEffect(exportStarted) {
         if (exportStarted) {
             // wait until exported data is marked, then offer to delete

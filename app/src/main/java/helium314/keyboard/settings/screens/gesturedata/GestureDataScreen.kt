@@ -154,7 +154,7 @@ fun GestureDataScreen(
     val focusRequester = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     val words = rememberSaveable { mutableListOf<Pair<String, Long>>() }
-    val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope { Dispatchers.IO }
     var activeGathering by rememberSaveable { mutableStateOf(false) }
     var showActiveInfoDialog by remember { mutableStateOf(false) }
     val maybeNotEnoughSpace = activeGathering && useWideLayout
