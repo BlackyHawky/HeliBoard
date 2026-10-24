@@ -3,6 +3,7 @@
 package helium314.keyboard.latin.dictionary
 
 import android.content.Context
+import android.text.TextUtils
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -16,6 +17,9 @@ import helium314.keyboard.latin.common.LocaleUtils
 import helium314.keyboard.latin.common.LocaleUtils.constructLocale
 import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.settings.Settings
+import helium314.keyboard.latin.utils.ScriptUtils.defaultScript
+import helium314.keyboard.latin.utils.ScriptUtils.script
+import helium314.keyboard.latin.utils.SubtypeLocaleUtils
 import helium314.keyboard.latin.utils.SubtypeSettings
 import helium314.keyboard.latin.utils.getSecondaryLocales
 import helium314.keyboard.latin.utils.htmlToAnnotated
@@ -141,3 +145,31 @@ fun cleanUnusedMainDicts(context: Context) {
 
 private fun hasAnythingOtherThanExtractedMainDictionary(dir: File) =
     dir.listFiles()?.any { it.name != DictionaryInfoUtils.MAIN_DICT_FILE_NAME } != false
+
+/** creates the request (string and args) to content resolver to get personal dictionary content */
+// todo: also check for system locales with correct language? e.g. system is en_IE, dictionary is en_GB -> we likely want the en_IE personal dict
+fun createPersonalDictionaryRequest(locale: Locale, alsoUseMoreRestrictiveLocales: Boolean): Pair<String, Array<String>> {
+    val request = StringBuilder("(locale is NULL)")
+    if (locale.script() != locale.defaultScript) {
+        // non-default script (e.g. sr-Latn / sr__#Latn) -> we want an exact match
+        request.append(" or (locale=?)")
+        return request.toString() to arrayOf(locale.toString())
+    }
+    // this really needs to be the locale string, as it interacts with system
+    val localeString = if (locale.language == SubtypeLocaleUtils.NO_LANGUAGE)
+        "" // If we don't have a locale, use the "all locales" user dictionary.
+    else locale.toString()
+
+    // process e.g. "en_US_foo_bar_qux" to ["en", "en_US", "en_US_foo_bar_qux"] and build the request string
+    val localeSplit = localeString.split("_", limit = 3)
+    var localeSoFar = ""
+    val localeStrings = localeSplit.map {
+        localeSoFar += if (localeSoFar.isEmpty()) it else "_$it"
+        request.append(" or (locale=?)")
+        localeSoFar
+    }
+
+    if (!alsoUseMoreRestrictiveLocales || localeStrings.size >= 3) return request.toString() to localeStrings.toTypedArray()
+    request.append(" or (locale like ?)")
+    return request.toString() to (localeStrings + ("${localeString}_%")).toTypedArray()
+}
