@@ -8,20 +8,16 @@ package helium314.keyboard.latin;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.inputmethodservice.InputMethodService;
-import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Message;
-import android.os.Process;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -45,7 +41,6 @@ import helium314.keyboard.keyboard.emoji.EmojiSearchActivityKt;
 import helium314.keyboard.keyboard.internal.KeyboardIconsSet;
 import helium314.keyboard.keyboard.internal.keyboard_parser.floris.KeyCode;
 import helium314.keyboard.latin.common.InsetsOutlineProvider;
-import helium314.keyboard.dictionarypack.DictionaryPackConstants;
 import helium314.keyboard.event.Event;
 import helium314.keyboard.event.InputTransaction;
 import helium314.keyboard.keyboard.Keyboard;
@@ -70,7 +65,6 @@ import helium314.keyboard.latin.suggestions.SuggestionStripViewAccessor;
 import helium314.keyboard.latin.touchinputconsumer.GestureConsumer;
 import helium314.keyboard.latin.utils.ColorUtilKt;
 import helium314.keyboard.latin.utils.FloatingKeyboardUtils;
-import helium314.keyboard.latin.utils.FoldableUtils;
 import helium314.keyboard.latin.utils.GestureDataGatheringKt;
 import helium314.keyboard.latin.utils.GestureDataGatheringSettings;
 import helium314.keyboard.latin.utils.InlineAutofillUtils;
@@ -98,7 +92,6 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 
 /**
  * Input method implementation for Qwerty'ish keyboard.
@@ -114,12 +107,6 @@ public class LatinIME extends InputMethodService implements
     private static final int PENDING_IMS_CALLBACK_DURATION_MILLIS = 800;
     static final long DELAY_WAIT_FOR_DICTIONARY_LOAD_MILLIS = TimeUnit.SECONDS.toMillis(2);
     static final long DELAY_DEALLOCATE_MEMORY_MILLIS = TimeUnit.SECONDS.toMillis(10);
-
-    /**
-     * The name of the scheme used by the Package Manager to warn of a new package installation,
-     * replacement or removal.
-     */
-    private static final String SCHEME_PACKAGE = "package";
 
     final Settings mSettings;
     public final KeyboardActionListener mKeyboardActionListener;
@@ -150,37 +137,7 @@ public class LatinIME extends InputMethodService implements
     @Nullable
     private Context mDisplayContext;
 
-    // Object for reacting to adding/removing a dictionary pack.
-    private final BroadcastReceiver mDictionaryPackInstallReceiver =
-            new DictionaryPackInstallBroadcastReceiver(this);
-
-    FoldableUtils.FoldableObserver foldableObserver;
-
-    private final BroadcastReceiver mEmojiSearchReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            onEmojiSearchDone(intent);
-        }
-    };
-
-    final static class RestartAfterDeviceUnlockReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            // Restart the keyboard if credential encrypted storage is unlocked. This reloads the
-            // dictionary and other data from credential-encrypted storage (with the onCreate()
-            // method).
-            if (Intent.ACTION_USER_UNLOCKED.equals(action)) {
-                final int myPid = Process.myPid();
-                Log.i(TAG, "Killing my process: pid=" + myPid);
-                Process.killProcess(myPid);
-            } else {
-                Log.e(TAG, "Unexpected intent " + intent);
-            }
-        }
-    }
-    final RestartAfterDeviceUnlockReceiver mRestartAfterDeviceUnlockReceiver = new RestartAfterDeviceUnlockReceiver();
-
+    private StuffReceiver mReceiver = new StuffReceiver(this);
     private AlertDialog mOptionsDialog;
 
     private final boolean mIsHardwareAcceleratedDrawingEnabled;
@@ -550,34 +507,7 @@ public class LatinIME extends InputMethodService implements
         loadSettings();
         mClipboardHistoryManager.onCreate();
         mHandler.onCreate();
-        if (FoldableUtils.INSTANCE.isFoldable())
-            foldableObserver = new FoldableUtils.FoldableObserver(this);
-
-        // Register to receive ringer mode change.
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
-        registerReceiver(mRingerModeChangeReceiver, filter);
-
-        // Register to receive installation and removal of a dictionary pack.
-        final IntentFilter packageFilter = new IntentFilter();
-        packageFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        packageFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        packageFilter.addDataScheme(SCHEME_PACKAGE);
-        registerReceiver(mDictionaryPackInstallReceiver, packageFilter);
-
-        final IntentFilter newDictFilter = new IntentFilter();
-        newDictFilter.addAction(DictionaryPackConstants.NEW_DICTIONARY_INTENT_ACTION);
-        // RECEIVER_EXPORTED is necessary because apparently Android 15 (and others?) don't recognize if the sender and receiver are the same app, see https://github.com/HeliBorg/HeliBoard/pull/1756
-        ContextCompat.registerReceiver(this, mDictionaryPackInstallReceiver, newDictFilter, ContextCompat.RECEIVER_EXPORTED);
-
-        final IntentFilter restartAfterUnlockFilter = new IntentFilter();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            restartAfterUnlockFilter.addAction(Intent.ACTION_USER_UNLOCKED);
-        registerReceiver(mRestartAfterDeviceUnlockReceiver, restartAfterUnlockFilter);
-
-        final IntentFilter emojiSearchFilter = new IntentFilter();
-        emojiSearchFilter.addAction(EmojiSearchActivity.EMOJI_SEARCH_DONE_ACTION);
-        ContextCompat.registerReceiver(this, mEmojiSearchReceiver, emojiSearchFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
+        mReceiver.register(this);
 
         StatsUtils.onCreate(mSettings.getCurrent(), mRichImm);
     }
@@ -694,12 +624,7 @@ public class LatinIME extends InputMethodService implements
         mClipboardHistoryManager.onDestroy();
         mDictionaryFacilitator.closeDictionaries();
         mSettings.onDestroy();
-        if (foldableObserver != null)
-            foldableObserver.unregister(this);
-        unregisterReceiver(mRingerModeChangeReceiver);
-        unregisterReceiver(mDictionaryPackInstallReceiver);
-        unregisterReceiver(mRestartAfterDeviceUnlockReceiver);
-        unregisterReceiver(mEmojiSearchReceiver);
+        mReceiver.unregisterAll(this);
         mStatsUtilsManager.onDestroy(this /* context */);
         super.onDestroy();
         mHandler.removeCallbacksAndMessages(null);
@@ -1691,25 +1616,6 @@ public class LatinIME extends InputMethodService implements
     // boolean onKeyLongPress(final int keyCode, final KeyEvent event);
     // boolean onKeyMultiple(final int keyCode, final int count, final KeyEvent event);
 
-    // receive ringer mode change.
-    private final BroadcastReceiver mRingerModeChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            final String action = intent.getAction();
-            if (AudioManager.RINGER_MODE_CHANGED_ACTION.equals(action)) {
-                boolean dnd;
-                try {
-                    dnd = android.provider.Settings.Global.getInt(context.getContentResolver(), "zen_mode") != 0;
-                } catch (android.provider.Settings.SettingNotFoundException e) {
-                    dnd = false;
-                    Log.w(TAG, "zen_mode setting not found, assuming disabled");
-                }
-                Log.i(TAG, "ringer mode changed, zen_mode on: "+dnd);
-                AudioAndHapticFeedbackManager.getInstance().onRingerModeChanged(dnd);
-            }
-        }
-    };
-
     public ClipboardHistoryManager getClipboardHistoryManager() {
         return mClipboardHistoryManager;
     }
@@ -1733,29 +1639,6 @@ public class LatinIME extends InputMethodService implements
         Log.d(EmojiSearchActivityKt.TAG, "before activity launch");
         startActivity(new Intent().setClass(this, EmojiSearchActivity.class)
                           .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_MULTIPLE_TASK));
-    }
-
-    private void onEmojiSearchDone(Intent intent) {
-        Log.d(EmojiSearchActivityKt.TAG, "after activity closing. isEmojiSearch: " + isEmojiSearch() + ". Intent: " + intent +
-                (intent != null ? ". imeClosed: " + isImeClosed(intent) + ". selected emoji: " + getSelectedEmoji(intent) : ""));
-        if (intent != null && EmojiSearchActivity.EMOJI_SEARCH_DONE_ACTION.equals(intent.getAction()) && ! isEmojiSearch()) {
-            if (isImeClosed(intent)) {
-                requestHideSelf(0);
-            } else {
-                mHandler.postDelayed(mKeyboardSwitcher::setEmojiKeyboard, 100);
-                if (intent.hasExtra(EmojiSearchActivity.EMOJI_KEY)) {
-                     onTextInput(intent.getStringExtra(EmojiSearchActivity.EMOJI_KEY));
-                }
-            }
-        }
-    }
-
-    private static boolean isImeClosed(Intent intent) {
-        return intent.getBooleanExtra(EmojiSearchActivity.IME_CLOSED_KEY, false);
-    }
-
-    private static String getSelectedEmoji(Intent intent) {
-        return intent.getStringExtra(EmojiSearchActivity.EMOJI_KEY);
     }
 
     public boolean isEmojiSearch() {
