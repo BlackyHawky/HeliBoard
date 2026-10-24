@@ -24,7 +24,6 @@ import helium314.keyboard.latin.dictionary.ReadOnlyBinaryDictionary
 import helium314.keyboard.latin.common.LocaleUtils.constructLocale
 import helium314.keyboard.latin.common.LocaleUtils.localizedDisplayName
 import helium314.keyboard.latin.makedict.DictionaryHeader
-import helium314.keyboard.latin.utils.DictionaryInfoUtils
 import helium314.keyboard.latin.utils.ScriptUtils.script
 import helium314.keyboard.latin.utils.SubtypeSettings
 import helium314.keyboard.latin.utils.locale
@@ -35,6 +34,7 @@ import java.util.Locale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import helium314.keyboard.latin.RichInputMethodManager
+import helium314.keyboard.latin.dictionary.DictionaryInfoUtils
 import helium314.keyboard.latin.makedict.CombinedInputOutput
 import helium314.keyboard.latin.makedict.DictIO
 

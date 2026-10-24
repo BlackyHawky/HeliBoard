@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
  */
 
-package helium314.keyboard.latin.personalization;
+package helium314.keyboard.latin.dictionary.history;
 
 import android.content.Context;
 

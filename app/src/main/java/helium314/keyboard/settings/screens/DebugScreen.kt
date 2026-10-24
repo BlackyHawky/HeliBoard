@@ -33,10 +33,10 @@ import com.android.inputmethod.latin.BinaryDictionary
 import helium314.keyboard.latin.common.LocaleUtils.constructLocale
 import helium314.keyboard.latin.common.LocaleUtils.localizedDisplayName
 import helium314.keyboard.latin.dictionary.AppsBinaryDictionary
-import helium314.keyboard.latin.dictionary.ContactsBinaryDictionary
+import helium314.keyboard.latin.dictionary.contacts.ContactsBinaryDictionary
 import helium314.keyboard.latin.dictionary.UserBinaryDictionary
 import helium314.keyboard.latin.makedict.DictIO
-import helium314.keyboard.latin.personalization.UserHistoryDictionary
+import helium314.keyboard.latin.dictionary.history.UserHistoryDictionary
 import helium314.keyboard.latin.utils.getActivity
 import helium314.keyboard.settings.dialogs.ListPickerDialog
 import helium314.keyboard.settings.filePicker

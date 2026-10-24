@@ -18,9 +18,9 @@ import helium314.keyboard.latin.RichInputMethodManager.Companion.getInstance
 import helium314.keyboard.latin.RichInputMethodSubtype
 import helium314.keyboard.latin.RichInputMethodSubtype.Companion.emojiSubtype
 import helium314.keyboard.latin.RichInputMethodSubtype.Companion.noLanguageSubtype
+import helium314.keyboard.latin.dictionary.DictionaryInfoUtils.getLocalesWithEmojiDicts
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.settings.SettingsValues
-import helium314.keyboard.latin.utils.DictionaryInfoUtils.getLocalesWithEmojiDicts
 import helium314.keyboard.latin.utils.InputTypeUtils
 import helium314.keyboard.latin.utils.Log
 import helium314.keyboard.latin.utils.ResourceUtils

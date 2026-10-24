@@ -3,12 +3,11 @@
  * modified
  * SPDX-License-Identifier: Apache-2.0 AND GPL-3.0-only
  */
-package helium314.keyboard.latin.utils
+package helium314.keyboard.latin.dictionary
 
 import android.content.Context
 import android.text.TextUtils
 import com.android.inputmethod.latin.utils.BinaryDictionaryUtils
-import helium314.keyboard.latin.dictionary.Dictionary
 import helium314.keyboard.latin.common.FileUtils
 import helium314.keyboard.latin.common.LocaleUtils.constructLocale
 import helium314.keyboard.latin.common.loopOverCodePoints
@@ -16,6 +15,9 @@ import helium314.keyboard.latin.define.DecoderSpecificConstants
 import helium314.keyboard.latin.makedict.DictionaryHeader
 import helium314.keyboard.latin.makedict.UnsupportedFormatException
 import helium314.keyboard.latin.settings.SpacingAndPunctuations
+import helium314.keyboard.latin.utils.Log
+import helium314.keyboard.latin.utils.SubtypeSettings
+import helium314.keyboard.latin.utils.locale
 import java.io.File
 import java.io.IOException
 import java.util.Locale

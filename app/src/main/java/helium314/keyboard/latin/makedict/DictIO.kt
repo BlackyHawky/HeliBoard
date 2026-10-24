@@ -4,9 +4,9 @@ package helium314.keyboard.latin.makedict
 
 import com.android.inputmethod.latin.BinaryDictionary
 import helium314.keyboard.latin.common.LocaleUtils.constructLocale
+import helium314.keyboard.latin.dictionary.DictionaryInfoUtils
 import helium314.keyboard.latin.makedict.FormatSpec.FormatOptions
 import helium314.keyboard.latin.utils.CombinedFormatUtils
-import helium314.keyboard.latin.utils.DictionaryInfoUtils
 import org.xml.sax.SAXException
 import java.io.BufferedWriter
 import java.io.File

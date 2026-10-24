@@ -7,7 +7,6 @@ package helium314.keyboard.latin.dictionary
 
 import android.content.Context
 import helium314.keyboard.latin.common.LocaleUtils
-import helium314.keyboard.latin.utils.DictionaryInfoUtils
 import helium314.keyboard.latin.utils.Log
 import java.io.File
 import java.util.LinkedList

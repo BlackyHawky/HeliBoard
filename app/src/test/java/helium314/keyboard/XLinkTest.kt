@@ -5,7 +5,7 @@ import helium314.keyboard.latin.App
 import helium314.keyboard.latin.BuildConfig
 import helium314.keyboard.latin.common.Links
 import helium314.keyboard.latin.common.LocaleUtils.constructLocale
-import helium314.keyboard.latin.utils.getKnownDictionariesForLocale
+import helium314.keyboard.latin.dictionary.getKnownDictionariesForLocale
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.io.File
