@@ -20,11 +20,11 @@ object ExpandableDictionaryUtils {
         }!!
         val prefs = context.prefs() // SettingsValues not initialized at this point on app start
         if (!prefs.getBoolean(Settings.PREF_USE_CONTACTS, Defaults.PREF_USE_CONTACTS))
-            files.forEach { if (it.name.startsWith(ContactsBinaryDictionary.NAME)) it.delete() }
+            files.forEach { if (it.name.startsWith(ContactsBinaryDictionary.NAME)) it.deleteRecursively() }
         if (!prefs.getBoolean(Settings.PREF_KEY_USE_PERSONALIZED_DICTS, Defaults.PREF_KEY_USE_PERSONALIZED_DICTS))
-            files.forEach { if (it.name.startsWith(UserBinaryDictionary.NAME)) it.delete() }
+            files.forEach { if (it.name.startsWith(UserBinaryDictionary.NAME)) it.deleteRecursively() }
         if (!prefs.getBoolean(Settings.PREF_USE_APPS, Defaults.PREF_USE_APPS))
-            files.forEach { if (it.name.startsWith(AppsBinaryDictionary.NAME)) it.delete() }
+            files.forEach { if (it.name.startsWith(AppsBinaryDictionary.NAME)) it.deleteRecursively() }
         upToDateDicts.addAll(files.map { it.nameWithoutExtension })
     }
 

@@ -642,7 +642,7 @@ class DictionaryFacilitatorImpl : DictionaryFacilitator {
         ): ExpandableBinaryDictionary? {
             try {
                 return when (dictType) {
-                    Dictionary.TYPE_USER_HISTORY -> UserHistoryDictionary.getDictionary(context, locale, dictFile, dictNamePrefix)
+                    Dictionary.TYPE_USER_HISTORY -> UserHistoryDictionary.getDictionary(context, locale)
                     Dictionary.TYPE_USER -> UserBinaryDictionary.getDictionary(context, locale, dictFile, dictNamePrefix)
                     Dictionary.TYPE_CONTACTS -> ContactsBinaryDictionary.getDictionary(context, locale, dictFile, dictNamePrefix)
                     Dictionary.TYPE_APPS -> AppsBinaryDictionary.getDictionary(context, locale, dictFile, dictNamePrefix)

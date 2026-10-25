@@ -55,8 +55,8 @@ import helium314.keyboard.latin.common.CoordinateUtils;
 import helium314.keyboard.latin.common.InputPointers;
 import helium314.keyboard.latin.common.ViewOutlineProviderUtilsKt;
 import helium314.keyboard.latin.define.DebugFlags;
+import helium314.keyboard.latin.dictionary.history.UserHistoryDictUtils;
 import helium314.keyboard.latin.inputlogic.InputLogic;
-import helium314.keyboard.latin.dictionary.history.PersonalizationHelper;
 import helium314.keyboard.latin.settings.Settings;
 import helium314.keyboard.latin.settings.SettingsSubtype;
 import helium314.keyboard.latin.settings.SettingsValues;
@@ -532,11 +532,10 @@ public class LatinIME extends InputMethodService implements
         mStatsUtilsManager.onLoadSettings(this, currentSettingsValues);
     }
 
-    private void refreshPersonalizationDictionarySession(
-            final SettingsValues currentSettingsValues) {
+    private void refreshPersonalizationDictionarySession(SettingsValues currentSettingsValues) {
         if (!currentSettingsValues.mUsePersonalizedDicts) {
             // Remove user history dictionaries.
-            PersonalizationHelper.removeAllUserHistoryDictionaries(this);
+            UserHistoryDictUtils.removeAllUserHistoryDictionaries(this);
             mDictionaryFacilitator.clearUserHistoryDictionary(this);
         }
     }
