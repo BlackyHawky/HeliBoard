@@ -3,7 +3,6 @@
 package helium314.keyboard.latin.dictionary
 
 import android.content.Context
-import android.text.TextUtils
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -147,7 +146,6 @@ private fun hasAnythingOtherThanExtractedMainDictionary(dir: File) =
     dir.listFiles()?.any { it.name != DictionaryInfoUtils.MAIN_DICT_FILE_NAME } != false
 
 /** creates the request (string and args) to content resolver to get personal dictionary content */
-// todo: also check for system locales with correct language? e.g. system is en_IE, dictionary is en_GB -> we likely want the en_IE personal dict
 fun createPersonalDictionaryRequest(locale: Locale, alsoUseMoreRestrictiveLocales: Boolean): Pair<String, Array<String>> {
     val request = StringBuilder("(locale is NULL)")
     if (locale.script() != locale.defaultScript) {
@@ -163,13 +161,29 @@ fun createPersonalDictionaryRequest(locale: Locale, alsoUseMoreRestrictiveLocale
     // process e.g. "en_US_foo_bar_qux" to ["en", "en_US", "en_US_foo_bar_qux"] and build the request string
     val localeSplit = localeString.split("_", limit = 3)
     var localeSoFar = ""
-    val localeStrings = localeSplit.map {
+    val localeStrings = localeSplit.mapTo(mutableListOf()) {
         localeSoFar += if (localeSoFar.isEmpty()) it else "_$it"
         request.append(" or (locale=?)")
         localeSoFar
     }
 
-    if (!alsoUseMoreRestrictiveLocales || localeStrings.size >= 3) return request.toString() to localeStrings.toTypedArray()
-    request.append(" or (locale like ?)")
-    return request.toString() to (localeStrings + ("${localeString}_%")).toTypedArray()
+    if (alsoUseMoreRestrictiveLocales && localeStrings.size < 3) {
+        request.append(" or (locale like ?)")
+        localeStrings.add("${localeString}_%")
+    }
+
+    SubtypeSettings.getSystemLocales().forEach {
+        if (it.language != locale.language || localeString == it.toString()) return@forEach
+        if (it.country.isNullOrEmpty() || locale.country.isNullOrEmpty() || it.country == locale.country) return@forEach
+        if (SubtypeSettings.getEnabledSubtypes(true).any { enabled -> enabled.locale() == it }) return@forEach
+        // same language, different (but existing) countries, no subtype specifically for that system locale
+        // in that case we also want to use the personal dictionary of that locale (e.g. en_GB dict and en_IE system locale)
+        request.append(" or (locale=?)")
+        localeStrings.add("${it.language}_${it.country}")
+        if (alsoUseMoreRestrictiveLocales) {
+            request.append(" or (locale like ?)")
+            localeStrings.add("${it.language}_${it.country}_%")
+        }
+    }
+    return request.toString() to localeStrings.toTypedArray()
 }
