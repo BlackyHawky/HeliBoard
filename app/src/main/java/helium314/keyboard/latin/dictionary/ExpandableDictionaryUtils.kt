@@ -3,8 +3,12 @@ package helium314.keyboard.latin.dictionary
 
 import android.content.Context
 import helium314.keyboard.latin.define.DebugFlags
+import helium314.keyboard.latin.dictionary.contacts.ContactsBinaryDictionary
 import helium314.keyboard.latin.dictionary.history.UserHistoryDictionary
+import helium314.keyboard.latin.settings.Defaults
+import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.Log
+import helium314.keyboard.latin.utils.prefs
 
 object ExpandableDictionaryUtils {
     private val upToDateDicts = hashSetOf<String>()
@@ -13,8 +17,15 @@ object ExpandableDictionaryUtils {
     fun initUpToDateDicts(context: Context) {
         val files = context.filesDir.listFiles {
             it.isDirectory && it.name.endsWith(".dict") && !it.name.startsWith(UserHistoryDictionary.NAME)
-        }
-        upToDateDicts.addAll(files!!.map { it.nameWithoutExtension })
+        }!!
+        val prefs = context.prefs() // SettingsValues not initialized at this point on app start
+        if (!prefs.getBoolean(Settings.PREF_USE_CONTACTS, Defaults.PREF_USE_CONTACTS))
+            files.forEach { if (it.name.startsWith(ContactsBinaryDictionary.NAME)) it.delete() }
+        if (!prefs.getBoolean(Settings.PREF_KEY_USE_PERSONALIZED_DICTS, Defaults.PREF_KEY_USE_PERSONALIZED_DICTS))
+            files.forEach { if (it.name.startsWith(UserBinaryDictionary.NAME)) it.delete() }
+        if (!prefs.getBoolean(Settings.PREF_USE_APPS, Defaults.PREF_USE_APPS))
+            files.forEach { if (it.name.startsWith(AppsBinaryDictionary.NAME)) it.delete() }
+        upToDateDicts.addAll(files.map { it.nameWithoutExtension })
     }
 
     @JvmStatic
