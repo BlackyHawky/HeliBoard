@@ -448,9 +448,13 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
         val info = suggestedWords.getInfo(index)
         if (info.word != word) return
 
-        val text = info.mSourceDict.mDictType + ":" + info.mSourceDict.mLocale
         if (isShowingMoreSuggestionPanel) {
             moreSuggestionsView.dismissPopupKeysPanel()
+        }
+        var text = info.mSourceDict.mDictType + ":" + info.mSourceDict.mLocale
+        if (index == 1 && suggestedWords.typedWordInfo.mSourceDict.mDictType != Dictionary.TYPE_USER_TYPED) {
+            val dict = suggestedWords.typedWordInfo.mSourceDict
+            text += "\n${suggestedWords.typedWordInfo.word}: ${dict.mDictType}:${dict.mLocale}"
         }
         KeyboardSwitcher.getInstance().showToast(text, true)
     }
