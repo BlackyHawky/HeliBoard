@@ -429,7 +429,7 @@
     <string name="landscape">Peisaj</string>
     <string name="label_zwnj_key" tools:keep="@string/label_zwnj_key">Separare fără spațiu</string>
     <string name="inline_emoji_search_summary">Sugerează emojiuri doar când un cuvânt este precedat de două puncte</string>
-    <string name="emoji_dictionary_required">Această funcție necesită un dicționar de emoji. Dicționarele în format .dict pot fi descărcate %s.</string>
+    <string name="emoji_dictionary_required">Pentru ca această funcție să funcționeze, este necesar un dicționar de emoji. Dicționarele în format .dict pot fi descărcate de la %s.</string>
     <string name="toolbar_swipe_down_to_hide">Ascunde tastatura prin glisare</string>
     <string name="toolbar_swipe_down_to_hide_summary">Glisează în jos pe bara de instrumente pentru a închide tastatura</string>
     <string name="auto_correct_capitalized_suggestions">Corectează automat sugestiile cu literă mare</string>
@@ -466,4 +466,15 @@
     <string name="ask_later">Întreabă mai târziu</string>
     <string name="spell_check_suggestions">Afișare sugestii corectare ortografică</string>
     <string name="spell_check_suggestions_summary">Afișare sugestii la selectarea unui cuvânt subliniat cu roșu. Necesită setarea aplicației drept corector ortografic implicit.</string>
+    <string name="inline_emoji_search">Căutare emoji în text</string>
+    <string name="clipboard_history_files">Adaugă imagini și alte fișiere în istoricul clipboardului</string>
+    <string name="prefs_key_gap_scale">Spațiu între taste</string>
+    <string name="prefs_bottom_row_scale">Dimensiune rând inferior</string>
+    <string name="custom_emoji_font">Alege font personalizat pentru emojiuri din fișier</string>
+    <string name="subtype_with_layout_generic">%1$s (%2$s)</string>
+    <string name="subtype_khipro_bn">%s (Khipro)</string>
+    <string name="layout_dpad" tools:keep="@string/layout_dpad">Tastatură în cruce</string>
+    <string name="accent_shifted_icon">Accentuare tastă majuscule</string>
+    <string name="space_swipe_toggle_dpad_entry">Activează tastatură în cruce</string>
+    <string name="gesture_data_screen">Colectare date despre gesturi</string>
 </resources>
