@@ -242,10 +242,10 @@ public final class InputView extends FrameLayout {
      * outside of it.
      */
     private static class MoreSuggestionsViewCanceler
-            extends MotionEventForwarder<View, SuggestionStripView> {
+            extends MotionEventForwarder<MainKeyboardView, SuggestionStripView> {
         public MoreSuggestionsViewCanceler(final MainKeyboardView mainKeyboardView,
                 final SuggestionStripView suggestionStripView) {
-            super(mainKeyboardView.getRootView(), suggestionStripView);
+            super(mainKeyboardView, suggestionStripView);
         }
 
         @Override
