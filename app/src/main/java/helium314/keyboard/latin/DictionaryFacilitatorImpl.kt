@@ -65,16 +65,6 @@ class DictionaryFacilitatorImpl : DictionaryFacilitator {
     @Volatile
     private var mLatchForWaitingLoadingMainDictionaries = CountDownLatch(0)
 
-    // The library does not deal well with ngram history for auto-capitalized words, so we adjust
-    // the ngram context to store next word suggestions for such cases.
-    // todo: this is awful, find a better solution / workaround
-    //  or remove completely? not sure if it's actually an improvement
-    //  should be fixed in the library, but that's not feasible with current user-provides-library approach
-    //  added in 12cbd43bda7d0f0cd73925e9cf836de751c32ed0 / https://github.com/HeliBorg/HeliBoard/issues/135
-    private var tryChangingWords = false
-    private var changeFrom = ""
-    private var changeTo = ""
-
     // todo: write cache never set, and never read (only written)
     //  tried to use read cache for a while, but small performance improvements are not worth the work,
     //  see https://github.com/HeliBorg/HeliBoard/issues/307
@@ -360,8 +350,6 @@ class DictionaryFacilitatorImpl : DictionaryFacilitator {
         val mainFreq = dictionaryGroup.getDict(Dictionary.TYPE_MAIN)?.getFrequency(word) ?: Dictionary.NOT_A_PROBABILITY
         if (mainFreq == 0 && blockPotentiallyOffensive)
             return
-        if (tryChangingWords)
-            tryChangingWords = ngramContext.changeWordIfAfterBeginningOfSentence(changeFrom, changeTo)
 
         val wordToUse: String
         // Check for isBeginningOfSentenceContext too, because not all text fields auto-capitalize in this case.
@@ -380,10 +368,9 @@ class DictionaryFacilitatorImpl : DictionaryFacilitator {
             } else {
                 // If however the word is not in the dictionary, or exists as a de-capitalized word
                 // only, then we consider that was a lower-case word that had been auto-capitalized.
+                // todo: in this case the capitalized word will still be in the ngram for the following words, which messes with the next word suggestions
+                //  but this should be improved in the native library once we remove loading the google library
                 wordToUse = decapitalizedWord
-                tryChangingWords = true
-                changeFrom = word
-                changeTo = wordToUse
             }
         } else {
             // HACK: We'd like to avoid adding the capitalized form of common words to the User
