@@ -9,10 +9,8 @@ package helium314.keyboard.latin.dictionary;
 import static helium314.keyboard.latin.dictionary.DictionaryUtilsKt.createPersonalDictionaryRequest;
 
 import android.content.Context;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
-import android.net.Uri;
 import android.provider.UserDictionary.Words;
 
 import com.android.inputmethod.latin.BinaryDictionary;
@@ -45,34 +43,17 @@ public class UserBinaryDictionary extends ExpandableBinaryDictionary {
 
     public static final String NAME = "userunigram";
 
-    private ContentObserver mObserver;
     final private boolean mAlsoUseMoreRestrictiveLocales;
 
     protected UserBinaryDictionary(Context context, Locale locale, boolean alsoUseMoreRestrictiveLocales, File dictFile, String name) {
         super(context, getDictName(name, locale, dictFile), locale, TYPE_USER, dictFile);
         mAlsoUseMoreRestrictiveLocales = alsoUseMoreRestrictiveLocales;
 
-        mObserver = new ContentObserver(null) {
-            @Override
-            public void onChange(boolean self, Uri uri) {
-                setNeedsToRecreate();
-            }
-        };
-        context.getContentResolver().registerContentObserver(Words.CONTENT_URI, true, mObserver);
         reloadDictionaryIfRequired();
     }
 
     public static UserBinaryDictionary getDictionary(Context context, Locale locale, File dictFile, String dictNamePrefix) {
         return new UserBinaryDictionary(context, locale, true, dictFile, dictNamePrefix + NAME);
-    }
-
-    @Override
-    public synchronized void close() {
-        if (mObserver != null) {
-            mContext.getContentResolver().unregisterContentObserver(mObserver);
-            mObserver = null;
-        }
-        super.close();
     }
 
     @Override

@@ -8,29 +8,22 @@ package helium314.keyboard.latin.dictionary.contacts;
 
 import android.Manifest;
 import android.content.Context;
-import android.net.Uri;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.Contacts;
-
-import helium314.keyboard.latin.NgramContext;
-import helium314.keyboard.latin.dictionary.Dictionary;
-import helium314.keyboard.latin.dictionary.ExpandableBinaryDictionary;
-import helium314.keyboard.latin.utils.Log;
 
 import androidx.annotation.NonNull;
 
 import com.android.inputmethod.latin.BinaryDictionary;
 
-import helium314.keyboard.latin.dictionary.contacts.ContactsManager.ContactsChangedListener;
-import helium314.keyboard.latin.common.StringUtils;
-import helium314.keyboard.latin.permissions.PermissionsUtil;
-
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Locale;
 
-public class ContactsBinaryDictionary extends ExpandableBinaryDictionary
-        implements ContactsChangedListener {
+import helium314.keyboard.latin.NgramContext;
+import helium314.keyboard.latin.common.StringUtils;
+import helium314.keyboard.latin.dictionary.Dictionary;
+import helium314.keyboard.latin.dictionary.ExpandableBinaryDictionary;
+import helium314.keyboard.latin.permissions.PermissionsUtil;
+import helium314.keyboard.latin.utils.Log;
+
+public class ContactsBinaryDictionary extends ExpandableBinaryDictionary {
     private static final String TAG = ContactsBinaryDictionary.class.getSimpleName();
     public static final String NAME = "contacts";
 
@@ -41,27 +34,18 @@ public class ContactsBinaryDictionary extends ExpandableBinaryDictionary
      * Whether to use "firstname lastname" in bigram predictions.
      */
     private final boolean mUseFirstLastBigrams;
-    private final ContactsManager mContactsManager;
 
     protected ContactsBinaryDictionary(final Context context, final Locale locale,
             final File dictFile, final String name) {
         super(context, getDictName(name, locale, dictFile), locale, Dictionary.TYPE_CONTACTS,
                 dictFile);
         mUseFirstLastBigrams = ContactsDictionaryUtils.useFirstLastBigramsForLocale(locale);
-        mContactsManager = new ContactsManager(context);
-        mContactsManager.registerForUpdates(this /* listener */);
         reloadDictionaryIfRequired();
     }
 
     public static ContactsBinaryDictionary getDictionary(final Context context, @NonNull final Locale locale,
             final File dictFile, final String dictNamePrefix) {
         return new ContactsBinaryDictionary(context, locale, dictFile, dictNamePrefix + NAME);
-    }
-
-    @Override
-    public synchronized void close() {
-        mContactsManager.close();
-        super.close();
     }
 
     /**
@@ -71,28 +55,19 @@ public class ContactsBinaryDictionary extends ExpandableBinaryDictionary
      */
     @Override
     public void loadInitialContentsLocked() {
-        loadDictionaryForUriLocked(ContactsContract.Profile.CONTENT_URI);
-        // TODO: Switch this URL to the newer ContactsContract too
-        loadDictionaryForUriLocked(Contacts.CONTENT_URI);
+        loadDictionaryLocked();
     }
 
     /**
      * Loads data within content providers to the dictionary.
      */
-    private void loadDictionaryForUriLocked(final Uri uri) {
-        if (!PermissionsUtil.checkAllPermissionsGranted(
-                mContext, Manifest.permission.READ_CONTACTS)) {
+    private void loadDictionaryLocked() {
+        if (!PermissionsUtil.checkAllPermissionsGranted(mContext, Manifest.permission.READ_CONTACTS)) {
             Log.i(TAG, "No permission to read contacts. Not loading the Dictionary.");
         }
 
-        final ArrayList<String> validNames = mContactsManager.getValidNames(uri);
-        for (final String name : validNames) {
+        for (String name : ContactsUtils.INSTANCE.getNames(mContext)) {
             addNameLocked(name);
-        }
-        if (uri.equals(Contacts.CONTENT_URI)) {
-            // Since we were able to add content successfully, update the local
-            // state of the manager.
-            mContactsManager.updateLocalState(validNames);
         }
     }
 
@@ -120,27 +95,17 @@ public class ContactsBinaryDictionary extends ExpandableBinaryDictionary
                     if (DEBUG) {
                         Log.d(TAG, "addName " + name + ", " + word + ", "  + ngramContext);
                     }
-                    runGCIfRequiredLocked(true /* mindsBlockByGC */);
-                    addUnigramLocked(word, ContactsDictionaryConstants.FREQUENCY_FOR_CONTACTS,
-                            null /* shortcut */, 0 /* shortcutFreq */, false /* isNotAWord */,
-                            false /* isPossiblyOffensive */,
-                            BinaryDictionary.NOT_A_VALID_TIMESTAMP);
+                    runGCIfRequiredLocked(true);
+                    addUnigramLocked(word, ContactsUtils.FREQUENCY_FOR_CONTACTS, null, 0,
+                        false, false, BinaryDictionary.NOT_A_VALID_TIMESTAMP);
                     if (ngramContext.isValid() && mUseFirstLastBigrams) {
                         runGCIfRequiredLocked(true /* mindsBlockByGC */);
-                        addNgramEntryLocked(ngramContext,
-                                word,
-                                ContactsDictionaryConstants.FREQUENCY_FOR_CONTACTS_BIGRAM,
-                                BinaryDictionary.NOT_A_VALID_TIMESTAMP);
+                        addNgramEntryLocked(ngramContext, word, ContactsUtils.FREQUENCY_FOR_CONTACTS_BIGRAM, BinaryDictionary.NOT_A_VALID_TIMESTAMP);
                     }
                     ngramContext = ngramContext.getNextNgramContext(
                             new NgramContext.WordInfo(word));
                 }
             }
         }
-    }
-
-    @Override
-    public void onContactsChange() {
-        setNeedsToRecreate();
     }
 }

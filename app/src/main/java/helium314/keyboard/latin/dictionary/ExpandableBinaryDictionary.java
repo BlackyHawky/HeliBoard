@@ -8,6 +8,7 @@ package helium314.keyboard.latin.dictionary;
 
 import android.content.Context;
 import helium314.keyboard.latin.NgramContext;
+import helium314.keyboard.latin.define.DebugFlags;
 import helium314.keyboard.latin.utils.Log;
 
 import androidx.annotation.NonNull;
@@ -87,9 +88,6 @@ abstract public class ExpandableBinaryDictionary extends Dictionary {
     /** Indicates whether a task for reloading the dictionary has been scheduled. */
     private final AtomicBoolean mIsReloading;
 
-    /** Indicates whether the current dictionary needs to be recreated. */
-    private boolean mNeedsToRecreate;
-
     private final ReentrantReadWriteLock mLock;
 
     /* A extension for a binary dictionary file. */
@@ -129,7 +127,6 @@ abstract public class ExpandableBinaryDictionary extends Dictionary {
         mDictFile = getDictFile(context, dictName, dictFile);
         mBinaryDictionary = null;
         mIsReloading = new AtomicBoolean();
-        mNeedsToRecreate = false;
         mLock = new ReentrantReadWriteLock();
     }
 
@@ -463,6 +460,8 @@ abstract public class ExpandableBinaryDictionary extends Dictionary {
      * Create a new binary dictionary and load initial contents.
      */
     void createNewDictionaryLocked() {
+        if (DebugFlags.DEBUG_ENABLED)
+            Log.i(TAG, "creating new dictionary: " + this.getClass().getSimpleName() + " " + mLocale);
         removeBinaryDictionaryLocked();
         createOnMemoryBinaryDictionaryLocked();
         loadInitialContentsLocked();
@@ -470,20 +469,16 @@ abstract public class ExpandableBinaryDictionary extends Dictionary {
         mBinaryDictionary.flushWithGCIfHasUpdated();
     }
 
-    /**
-     * Marks that the dictionary needs to be recreated.
-     *
-     */
-    protected void setNeedsToRecreate() {
-        mNeedsToRecreate = true;
+    private void clearNeedsToRecreate() {
+        ExpandableDictionaryUtils.setHasUpdated(this);
     }
 
-    void clearNeedsToRecreate() {
-        mNeedsToRecreate = false;
+    private boolean needsToRecreate() {
+        return ExpandableDictionaryUtils.needsUpdate(this);
     }
 
-    boolean isNeededToRecreate() {
-        return mNeedsToRecreate;
+    String getDictName() {
+        return mDictName;
     }
 
     /**
@@ -501,7 +496,7 @@ abstract public class ExpandableBinaryDictionary extends Dictionary {
      * Returns whether a dictionary reload is required.
      */
     private boolean isReloadRequired() {
-        return mBinaryDictionary == null || mNeedsToRecreate;
+        return mBinaryDictionary == null || needsToRecreate();
     }
 
     /**
@@ -515,7 +510,7 @@ abstract public class ExpandableBinaryDictionary extends Dictionary {
         final File dictFile = mDictFile;
         asyncExecuteTaskWithWriteLock(() -> {
             try {
-                if (!dictFile.exists() || isNeededToRecreate()) {
+                if (!dictFile.exists() || needsToRecreate()) {
                     // If the dictionary file does not exist or contents have been updated,
                     // generate a new one.
                     createNewDictionaryLocked();

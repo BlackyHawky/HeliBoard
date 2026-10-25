@@ -137,7 +137,7 @@ public class LatinIME extends InputMethodService implements
     @Nullable
     private Context mDisplayContext;
 
-    private StuffReceiver mReceiver = new StuffReceiver(this);
+    private final StuffReceiver mReceiver = new StuffReceiver(this);
     private AlertDialog mOptionsDialog;
 
     private final boolean mIsHardwareAcceleratedDrawingEnabled;
@@ -588,8 +588,9 @@ public class LatinIME extends InputMethodService implements
      * @param locale the locale
      */
     // TODO: make sure the current settings always have the right locales, and read from them.
-    private void resetDictionaryFacilitator(@NonNull final Locale locale) {
-        final SettingsValues settingsValues = mSettings.getCurrent();
+    private void resetDictionaryFacilitator(@NonNull Locale locale) {
+        SettingsValues settingsValues = mSettings.getCurrent();
+        mReceiver.updateDictionaryObservers(this);
         try {
             mDictionaryFacilitator.resetDictionaries(this, locale,
                 settingsValues.mUseContactsDictionary, settingsValues.mUseAppsDictionary,
