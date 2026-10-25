@@ -31,7 +31,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class StuffReceiver(latinIME: LatinIME) {
-    private val dictionaryPackInstallReceiver = DictionaryPackInstallBroadcastReceiver(latinIME)
+    private val dictionaryChangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action != DictionaryPackConstants.NEW_DICTIONARY_INTENT_ACTION) return
+            Log.i(TAG, "dictionary changed")
+            latinIME.resetSuggestMainDict()
+        }
+    }
 
     private val emojiSearchReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         private fun isImeClosed(intent: Intent) = intent.getBooleanExtra(EmojiSearchActivity.IME_CLOSED_KEY, false)
@@ -65,14 +71,10 @@ class StuffReceiver(latinIME: LatinIME) {
     fun register(context: Context) {
         context.registerReceiver(ringerModeChangeReceiver, IntentFilter(AudioManager.RINGER_MODE_CHANGED_ACTION))
 
-        // todo: do we actually need the package added/received in here? we don't have any installable dictionary packs...
-        val dictFilter = IntentFilter(Intent.ACTION_PACKAGE_ADDED)
-        dictFilter.addAction(Intent.ACTION_PACKAGE_REMOVED)
-        dictFilter.addAction(DictionaryPackConstants.NEW_DICTIONARY_INTENT_ACTION)
-        dictFilter.addDataScheme(SCHEME_PACKAGE)
+        val dictFilter = IntentFilter(DictionaryPackConstants.NEW_DICTIONARY_INTENT_ACTION)
         // RECEIVER_EXPORTED is necessary because apparently Android 15 (and others?) don't recognize
         // if the sender and receiver are the same app, see https://github.com/HeliBorg/HeliBoard/pull/1756
-        ContextCompat.registerReceiver(context, dictionaryPackInstallReceiver, dictFilter, ContextCompat.RECEIVER_EXPORTED)
+        ContextCompat.registerReceiver(context, dictionaryChangeReceiver, dictFilter, ContextCompat.RECEIVER_EXPORTED)
 
         ContextCompat.registerReceiver(context, emojiSearchReceiver, IntentFilter(EmojiSearchActivity.EMOJI_SEARCH_DONE_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
 
@@ -89,7 +91,7 @@ class StuffReceiver(latinIME: LatinIME) {
         context.unregisterReceiver(ringerModeChangeReceiver)
         foldableObserver?.unregister(context)
         foldableObserver = null
-        context.unregisterReceiver(dictionaryPackInstallReceiver)
+        context.unregisterReceiver(dictionaryChangeReceiver)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             context.unregisterReceiver(restartAfterDeviceUnlockReceiver)
         context.unregisterReceiver(emojiSearchReceiver)
