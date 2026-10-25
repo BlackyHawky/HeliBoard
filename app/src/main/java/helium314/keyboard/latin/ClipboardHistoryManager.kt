@@ -236,8 +236,12 @@ class ClipboardHistoryManager(
 
         val closeButton = binding.clipboardSuggestionClose
         closeButton.setImageDrawable(KeyboardIconsSet.instance.getIconDrawable(ToolbarKey.CLOSE_HISTORY.name.lowercase()))
-        closeButton.layoutParams.width = textView.lineHeight // scale the icon to the text
-        closeButton.layoutParams.height = textView.lineHeight
+        // don't, because this makes the button harder to hit (but the size is nice)
+        // closeButton.layoutParams.width = textView.lineHeight // scale the icon to the text
+        // closeButton.layoutParams.height = textView.lineHeight
+        // just shrink the image a little, but don't change button size
+        closeButton.scaleX = 0.8f
+        closeButton.scaleY = 0.8f
         closeButton.setOnClickListener { removeClipboardSuggestion() }
 
         val colors = latinIME.mSettings.current.mColors
